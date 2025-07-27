@@ -1,0 +1,22 @@
+{
+  "name": "task",
+  "version": "1.0.0",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ludvig-D/task-tracker.git"
+  },
+  "keywords": [
+    "task"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ludvig-D/task-tracker/issues"
+  },
+  "homepage": "https://github.com/Ludvig-D/task-tracker#readme",
+  "description": ""
+}
