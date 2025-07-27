@@ -5,7 +5,7 @@ const path = require('path');
 const readline = require('readline');
 
 const folderPath = path.join('/home/ludde/projekts/task-tracker');
-const jsonFilePath = path.join(folderPath, 'task.json');
+const jsonFilePath = path.join(__dirname, 'task.json');
 
 if (process.argv[2] == 'add') {
   fs.readFile(jsonFilePath, (err, data) => {
