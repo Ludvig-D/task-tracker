@@ -2,9 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
-
-const folderPath = path.join('/home/ludde/projekts/task-tracker');
 const jsonFilePath = path.join(__dirname, 'task.json');
 
 if (process.argv[2] == 'add') {
@@ -53,30 +50,27 @@ if (process.argv[2] == 'add') {
 } else if (process.argv[2] == 'list') {
   fs.readFile(jsonFilePath, (err, data) => {
     if (err) throw err;
+    let tasks = JSON.parse(data);
     if (data.buffer.byteLength > 0) {
       if (process.argv[3] == undefined) {
         console.log('List of all tasks');
-        let tasks = JSON.parse(data);
         tasks.map((task) => {
           console.log(
-            `(ID:${task.id}) ${
-              task.item.charAt(0).toUpperCase() + task.item.slice(1)
-            } - ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}`
+            `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+              task.status
+            )}`
           );
         });
       } else if (process.argv[3] == 'done') {
-        let tasks = JSON.parse(data);
         let listNum = tasks.filter((task) => task.status == 'done').length;
         if (listNum > 0) {
           console.log('List of all done tasks');
           tasks.map((task) => {
             if (task.status == 'done') {
               console.log(
-                `(ID:${task.id}) ${
-                  task.item.charAt(0).toUpperCase() + task.item.slice(1)
-                } - ${
-                  task.status.charAt(0).toUpperCase() + task.status.slice(1)
-                }`
+                `(ID:${task.id}) ${firstUpperCase(
+                  task.item
+                )} - ${firstUpperCase(task.status)}`
               );
             }
           });
@@ -84,18 +78,15 @@ if (process.argv[2] == 'add') {
           console.log('No tasks with status done');
         }
       } else if (process.argv[3] == 'todo') {
-        let tasks = JSON.parse(data);
         let listNum = tasks.filter((task) => task.status == 'todo').length;
         if (listNum > 0) {
           console.log('List of all todo tasks');
           tasks.map((task) => {
             if (task.status == 'todo') {
               console.log(
-                `(ID:${task.id}) ${
-                  task.item.charAt(0).toUpperCase() + task.item.slice(1)
-                } - ${
-                  task.status.charAt(0).toUpperCase() + task.status.slice(1)
-                }`
+                `(ID:${task.id}) ${firstUpperCase(
+                  task.item
+                )} - ${firstUpperCase(task.status)}`
               );
             }
           });
@@ -103,7 +94,6 @@ if (process.argv[2] == 'add') {
           console.log('No tasks with status todo');
         }
       } else if (process.argv[3] == 'in-progress') {
-        let tasks = JSON.parse(data);
         let listNum = tasks.filter(
           (task) => task.status == 'in-progress'
         ).length;
@@ -112,11 +102,9 @@ if (process.argv[2] == 'add') {
             if (task.status == 'in-progress') {
               console.log('List of all in-progress tasks');
               console.log(
-                `(ID:${task.id})asasd ${
-                  task.item.charAt(0).toUpperCase() + task.item.slice(1)
-                } - ${
-                  task.status.charAt(0).toUpperCase() + task.status.slice(1)
-                }`
+                `(ID:${task.id}) ${firstUpperCase(
+                  task.item
+                )} - ${firstUpperCase(task.status)}`
               );
             }
           });
@@ -128,4 +116,28 @@ if (process.argv[2] == 'add') {
       console.log('No tasks exist yet');
     }
   });
+} else if (process.argv[2] == 'update') {
+} else if (process.argv[2] == 'delete') {
+  if (Number.isInteger(parseInt(process.argv[3]))) {
+    fs.readFile(jsonFilePath, (err, data) => {
+      if (err) throw err;
+      let tasks = JSON.parse(data);
+      let taskExist = tasks.find((task) => task.id == process.argv[3]);
+      if (!taskExist) {
+        console.log('No task with that id');
+      } else {
+        console.log(
+          `(ID:${taskExist.id}) ${firstUpperCase(
+            taskExist.item
+          )} - ${firstUpperCase(taskExist.status)}`
+        );
+      }
+    });
+  } else {
+    console.log('Has to be a id number');
+  }
 }
+
+const firstUpperCase = (word) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
