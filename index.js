@@ -55,14 +55,14 @@ function listTasks(type) {
   }
 }
 
-let argv = process.argv;
-if (argv[2] == 'add') {
+let input = process.argv;
+if (input[2] == 'add') {
   let tasks = readTasks();
   try {
     let newTask = {
-      item: `${argv[3]}`,
+      item: `${input[3]}`,
       id: freeId(tasks),
-      status: argv[4] || 'todo',
+      status: input[4] || 'todo',
       createAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     };
@@ -72,44 +72,41 @@ if (argv[2] == 'add') {
   } catch (err) {
     throw err;
   }
-} else if (argv[2] == 'list') {
-  listTasks(argv[3]);
-} else if (argv[2] == 'update') {
-  if (Number.isInteger(parseInt(argv[3]))) {
-    if (argv[4]) {
-      fs.readFile(jsonFilePath, (err, data) => {
-        if (err) throw err;
-        let tasks = JSON.parse(data);
-        let taskExist = tasks.find((task) => task.id == argv[3]);
-        if (!taskExist) {
-          console.log('No task with that id');
-        } else {
-          tasks.map((task) => {
-            if (task.id == taskExist.id) {
-              task.item = argv[4];
-              task.updatedAt = new Date().getTime();
-            }
-          });
-          fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
-            if (err) throw err;
-            console.log(
-              `Task with id ${taskExist.id} has been updated succesfully`
-            );
-          });
-        }
-      });
+} else if (input[2] == 'list') {
+  listTasks(input[3]);
+} else if (input[2] == 'update') {
+  let tasks = readTasks();
+  if (Number.isInteger(parseInt(input[3]))) {
+    if (input[4]) {
+      let taskExist = tasks.find((task) => task.id == input[3]);
+      if (!taskExist) {
+        console.log('No task with that id');
+      } else {
+        tasks.map((task) => {
+          if (task.id == taskExist.id) {
+            task.item = input[4];
+            task.updatedAt = new Date().getTime();
+          }
+        });
+        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
+          if (err) throw err;
+          console.log(
+            `Task with id ${taskExist.id} has been updated succesfully`
+          );
+        });
+      }
     } else {
       console.log('Need to add what to update to');
     }
   } else {
     console.log('Need to specify which to update');
   }
-} else if (argv[2] == 'del') {
-  if (Number.isInteger(parseInt(argv[3]))) {
+} else if (input[2] == 'del') {
+  if (Number.isInteger(parseInt(input[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
       if (err) throw err;
       let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == argv[3]);
+      let taskExist = tasks.find((task) => task.id == input[3]);
       if (!taskExist) {
         console.log('No task with that id');
       } else {
@@ -125,12 +122,12 @@ if (argv[2] == 'add') {
   } else {
     console.log('Has to be a id number');
   }
-} else if (argv[2] == 'mark-in-progress') {
-  if (Number.isInteger(parseInt(argv[3]))) {
+} else if (input[2] == 'mark-in-progress') {
+  if (Number.isInteger(parseInt(input[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
       if (err) throw err;
       let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == argv[3]);
+      let taskExist = tasks.find((task) => task.id == input[3]);
       if (!taskExist) {
         console.log('No task with that id');
       } else {
@@ -151,12 +148,12 @@ if (argv[2] == 'add') {
   } else {
     console.log('Need to specify which to update');
   }
-} else if (argv[2] == 'mark-done') {
-  if (Number.isInteger(parseInt(argv[3]))) {
+} else if (input[2] == 'mark-done') {
+  if (Number.isInteger(parseInt(input[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
       if (err) throw err;
       let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == argv[3]);
+      let taskExist = tasks.find((task) => task.id == input[3]);
       if (!taskExist) {
         console.log('No task with that id');
       } else {
@@ -177,12 +174,12 @@ if (argv[2] == 'add') {
   } else {
     console.log('Need to specify which to update');
   }
-} else if (argv[2] == 'mark-todo') {
-  if (Number.isInteger(parseInt(argv[3]))) {
+} else if (input[2] == 'mark-todo') {
+  if (Number.isInteger(parseInt(input[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
       if (err) throw err;
       let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == argv[3]);
+      let taskExist = tasks.find((task) => task.id == input[3]);
       if (!taskExist) {
         console.log('No task with that id');
       } else {
@@ -203,7 +200,7 @@ if (argv[2] == 'add') {
   } else {
     console.log('Need to specify which to update');
   }
-} else if (argv[2] == undefined) {
+} else if (input[2] == undefined) {
   console.log('Here are all the commands you can do:');
   console.log();
   console.log(
