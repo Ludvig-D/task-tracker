@@ -116,6 +116,34 @@ if (process.argv[2] == 'add') {
     }
   });
 } else if (process.argv[2] == 'update') {
+  if (Number.isInteger(parseInt(process.argv[3]))) {
+    if (process.argv[4]) {
+      fs.readFile(jsonFilePath, (err, data) => {
+        if (err) throw err;
+        let tasks = JSON.parse(data);
+        let taskExist = tasks.find((task) => task.id == process.argv[3]);
+        if (!taskExist) {
+          console.log('No task with that id');
+        } else {
+          tasks.map((task) => {
+            if (task.id == taskExist.id) {
+              return (task.item = process.argv[4]);
+            }
+          });
+          fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
+            if (err) throw err;
+            console.log(
+              `Task with id ${taskExist.id} has been updated succesfully`
+            );
+          });
+        }
+      });
+    } else {
+      console.log('Need to add what to update to');
+    }
+  } else {
+    console.log('Need to specify which to update');
+  }
 } else if (process.argv[2] == 'del') {
   if (Number.isInteger(parseInt(process.argv[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
