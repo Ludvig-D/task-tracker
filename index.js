@@ -6,6 +6,7 @@ const jsonFilePath = path.join(__dirname, 'task.json');
 
 if (process.argv[2] == 'add') {
   fs.readFile(jsonFilePath, (err, data) => {
+    let tasks = [];
     if (err) {
       if (err.code == 'ENOENT') {
         let newtask = [
@@ -25,11 +26,9 @@ if (process.argv[2] == 'add') {
         throw err;
       }
     } else {
-      let tasks = [];
       if (data.buffer.byteLength > 0) {
         tasks = JSON.parse(data);
       }
-
       let newtask = {
         item: `${process.argv[3]}`,
         id: freeId(tasks),
@@ -49,7 +48,8 @@ if (process.argv[2] == 'add') {
 } else if (process.argv[2] == 'list') {
   fs.readFile(jsonFilePath, (err, data) => {
     if (err) throw err;
-    let tasks = JSON.parse(data);
+    let parsedJson = JSON.parse(data);
+    let tasks = parsedJson.sort((a, b) => a.id - b.id);
     if (data.buffer.byteLength > 0) {
       if (process.argv[3] == undefined) {
         console.log('List of all tasks');
@@ -116,7 +116,7 @@ if (process.argv[2] == 'add') {
     }
   });
 } else if (process.argv[2] == 'update') {
-} else if (process.argv[2] == 'delete') {
+} else if (process.argv[2] == 'del') {
   if (Number.isInteger(parseInt(process.argv[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
       if (err) throw err;
