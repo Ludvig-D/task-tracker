@@ -56,8 +56,8 @@ function listTasks(type) {
 }
 
 function update(id, newText) {
-  let tasks = readTasks();
   if (Number.isInteger(parseInt(id))) {
+    let tasks = readTasks();
     if (newText) {
       let taskExist = tasks.find((task) => task.id == input[3]);
       if (!taskExist) {
@@ -79,6 +79,22 @@ function update(id, newText) {
     }
   } else {
     console.log('You need to specify which item to update using its ID');
+  }
+}
+
+function del(id) {
+  if (Number.isInteger(parseInt(id))) {
+    let tasks = readTasks();
+    let taskExist = tasks.find((task) => task.id == id);
+    if (!taskExist) {
+      console.log('No task with that id');
+    } else {
+      tasks.splice(tasks.indexOf(taskExist), 1);
+      writeFile(tasks);
+      console.log(`Deleted task succesfully ID: ${id}`);
+    }
+  } else {
+    console.log('Has to be a id number');
   }
 }
 
@@ -104,26 +120,7 @@ if (input[2] == 'add') {
 } else if (input[2] == 'update') {
   update(input[3], input[4]);
 } else if (input[2] == 'del') {
-  if (Number.isInteger(parseInt(input[3]))) {
-    fs.readFile(jsonFilePath, (err, data) => {
-      if (err) throw err;
-      let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == input[3]);
-      if (!taskExist) {
-        console.log('No task with that id');
-      } else {
-        tasks.splice(tasks.indexOf(taskExist), 1);
-        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
-          if (err) throw err;
-          console.log(
-            `Task with id ${taskExist.id} has been succesfully removed`
-          );
-        });
-      }
-    });
-  } else {
-    console.log('Has to be a id number');
-  }
+  del(input[3]);
 } else if (input[2] == 'mark-in-progress') {
   if (Number.isInteger(parseInt(input[3]))) {
     fs.readFile(jsonFilePath, (err, data) => {
