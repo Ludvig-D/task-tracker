@@ -127,7 +127,8 @@ if (process.argv[2] == 'add') {
         } else {
           tasks.map((task) => {
             if (task.id == taskExist.id) {
-              return (task.item = process.argv[4]);
+              task.item = process.argv[4];
+              task.updatedAt = new Date().getTime();
             }
           });
           fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
@@ -176,7 +177,8 @@ if (process.argv[2] == 'add') {
       } else {
         tasks.map((task) => {
           if (task.id == taskExist.id) {
-            return (task.status = 'in-progress');
+            task.status = 'in-progress';
+            task.updatedAt = new Date().getTime();
           }
         });
         fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
@@ -201,7 +203,8 @@ if (process.argv[2] == 'add') {
       } else {
         tasks.map((task) => {
           if (task.id == taskExist.id) {
-            return (task.status = 'done');
+            task.status = 'done';
+            task.updatedAt = new Date().getTime();
           }
         });
         fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
@@ -226,7 +229,8 @@ if (process.argv[2] == 'add') {
       } else {
         tasks.map((task) => {
           if (task.id == taskExist.id) {
-            return (task.status = 'todo');
+            task.status = 'todo';
+            task.updatedAt = new Date().getTime();
           }
         });
         fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
