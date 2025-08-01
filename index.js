@@ -8,7 +8,8 @@ function readTasks() {
   if (fs.existsSync(jsonFilePath)) {
     try {
       const data = fs.readFileSync(jsonFilePath);
-      return JSON.parse(data);
+      const tasks = JSON.parse(data).sort((a, b) => a.id - b.id);
+      return tasks;
     } catch (err) {
       throw err;
     }
@@ -34,75 +35,69 @@ if (argv[2] == 'add') {
     console.log(`Task added successfully (ID: ${newtask.id})`);
   });
 } else if (argv[2] == 'list') {
-  fs.readFile(jsonFilePath, (err, data) => {
-    if (err) throw err;
-    let parsedJson = JSON.parse(data);
-    let tasks = parsedJson.sort((a, b) => a.id - b.id);
-    if (data.buffer.byteLength > 0) {
-      if (argv[3] == undefined) {
-        console.log('List of all tasks');
+  let tasks = readTasks();
+  if (tasks != []) {
+    if (argv[3] == undefined) {
+      console.log('List of all tasks');
+      tasks.map((task) => {
+        console.log(
+          `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+            task.status
+          )}`
+        );
+      });
+    } else if (argv[3] == 'done') {
+      let listNum = tasks.filter((task) => task.status == 'done').length;
+      if (listNum > 0) {
+        console.log('List of all done tasks');
         tasks.map((task) => {
-          console.log(
-            `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
-              task.status
-            )}`
-          );
+          if (task.status == 'done') {
+            console.log(
+              `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+                task.status
+              )}`
+            );
+          }
         });
-      } else if (argv[3] == 'done') {
-        let listNum = tasks.filter((task) => task.status == 'done').length;
-        if (listNum > 0) {
-          console.log('List of all done tasks');
-          tasks.map((task) => {
-            if (task.status == 'done') {
-              console.log(
-                `(ID:${task.id}) ${firstUpperCase(
-                  task.item
-                )} - ${firstUpperCase(task.status)}`
-              );
-            }
-          });
-        } else {
-          console.log('No tasks with status done');
-        }
-      } else if (argv[3] == 'todo') {
-        let listNum = tasks.filter((task) => task.status == 'todo').length;
-        if (listNum > 0) {
-          console.log('List of all todo tasks');
-          tasks.map((task) => {
-            if (task.status == 'todo') {
-              console.log(
-                `(ID:${task.id}) ${firstUpperCase(
-                  task.item
-                )} - ${firstUpperCase(task.status)}`
-              );
-            }
-          });
-        } else {
-          console.log('No tasks with status todo');
-        }
-      } else if (argv[3] == 'in-progress') {
-        let listNum = tasks.filter(
-          (task) => task.status == 'in-progress'
-        ).length;
-        if (listNum > 0) {
-          tasks.map((task) => {
-            if (task.status == 'in-progress') {
-              console.log('List of all in-progress tasks');
-              console.log(
-                `(ID:${task.id}) ${firstUpperCase(
-                  task.item
-                )} - ${firstUpperCase(task.status)}`
-              );
-            }
-          });
-        } else {
-          console.log('No tasks with status in-progress');
-        }
+      } else {
+        console.log('No tasks with status done');
       }
-    } else {
-      console.log('No tasks exist yet');
+    } else if (argv[3] == 'todo') {
+      let listNum = tasks.filter((task) => task.status == 'todo').length;
+      if (listNum > 0) {
+        console.log('List of all todo tasks');
+        tasks.map((task) => {
+          if (task.status == 'todo') {
+            console.log(
+              `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+                task.status
+              )}`
+            );
+          }
+        });
+      } else {
+        console.log('No tasks with status todo');
+      }
+    } else if (argv[3] == 'in-progress') {
+      let listNum = tasks.filter((task) => task.status == 'in-progress').length;
+      if (listNum > 0) {
+        tasks.map((task) => {
+          if (task.status == 'in-progress') {
+            console.log('List of all in-progress tasks');
+            console.log(
+              `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+                task.status
+              )}`
+            );
+          }
+        });
+      } else {
+        console.log('No tasks with status in-progress');
+      }
     }
-  });
+  } else {
+    console.log('No tasks exist yet');
+  }
 } else if (argv[2] == 'update') {
   if (Number.isInteger(parseInt(argv[3]))) {
     if (argv[4]) {
@@ -249,9 +244,9 @@ if (argv[2] == 'add') {
   console.log('list in-progress');
 }
 
-const firstUpperCase = (word) => {
+function firstUpperCase(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
-};
+}
 
 function compareIds(a, b) {
   return a - b;
