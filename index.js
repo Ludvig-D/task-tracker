@@ -11,7 +11,10 @@ if (process.argv[2] == 'add') {
         let newtask = [
           {
             item: `${process.argv[3]}`,
-            id: 1,
+            id: freeId(tasks),
+            status: process.argv[4] || 'todo',
+            createAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
           },
         ];
         fs.writeFile(jsonFilePath, JSON.stringify(newtask), (err) => {
