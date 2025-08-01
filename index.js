@@ -154,9 +154,9 @@ const freeId = (tasks) => {
     })
     .sort(compareIds);
 
-  let idList = sortedIds[sortedIds.length - 1];
+  let idList = sortedIds[sortedIds.length - 1] || 1;
 
-  for (let i = 1; i <= sortedIds[sortedIds.length - 1]; i++) {
+  for (let i = 1; i <= idList; i++) {
     let idDosentExitYet = sortedIds.find((id) => id == i);
     if (idDosentExitYet == undefined) {
       return i;
