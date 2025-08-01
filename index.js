@@ -240,6 +240,21 @@ if (process.argv[2] == 'add') {
   } else {
     console.log('Need to specify which to update');
   }
+} else if (process.argv[2] == undefined) {
+  console.log('Here are all the commands you can do:');
+  console.log();
+  console.log('add "Write what you need to do here"');
+  console.log('update (ID) "Write what you want to change the task to"');
+  console.log('del (ID)');
+  console.log();
+  console.log('mark-todo (ID)');
+  console.log('mark-done (ID)');
+  console.log('mark-in-progress (ID)');
+  console.log();
+  console.log('list');
+  console.log('list todo');
+  console.log('list done');
+  console.log('list in-progress');
 }
 
 const firstUpperCase = (word) => {
