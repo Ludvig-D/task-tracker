@@ -165,6 +165,81 @@ if (process.argv[2] == 'add') {
   } else {
     console.log('Has to be a id number');
   }
+} else if (process.argv[2] == 'mark-in-progress') {
+  if (Number.isInteger(parseInt(process.argv[3]))) {
+    fs.readFile(jsonFilePath, (err, data) => {
+      if (err) throw err;
+      let tasks = JSON.parse(data);
+      let taskExist = tasks.find((task) => task.id == process.argv[3]);
+      if (!taskExist) {
+        console.log('No task with that id');
+      } else {
+        tasks.map((task) => {
+          if (task.id == taskExist.id) {
+            return (task.status = 'in-progress');
+          }
+        });
+        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
+          if (err) throw err;
+          console.log(
+            `Task with id ${taskExist.id} has been updated succesfully`
+          );
+        });
+      }
+    });
+  } else {
+    console.log('Need to specify which to update');
+  }
+} else if (process.argv[2] == 'mark-done') {
+  if (Number.isInteger(parseInt(process.argv[3]))) {
+    fs.readFile(jsonFilePath, (err, data) => {
+      if (err) throw err;
+      let tasks = JSON.parse(data);
+      let taskExist = tasks.find((task) => task.id == process.argv[3]);
+      if (!taskExist) {
+        console.log('No task with that id');
+      } else {
+        tasks.map((task) => {
+          if (task.id == taskExist.id) {
+            return (task.status = 'done');
+          }
+        });
+        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
+          if (err) throw err;
+          console.log(
+            `Task with id ${taskExist.id} has been updated succesfully`
+          );
+        });
+      }
+    });
+  } else {
+    console.log('Need to specify which to update');
+  }
+} else if (process.argv[2] == 'mark-todo') {
+  if (Number.isInteger(parseInt(process.argv[3]))) {
+    fs.readFile(jsonFilePath, (err, data) => {
+      if (err) throw err;
+      let tasks = JSON.parse(data);
+      let taskExist = tasks.find((task) => task.id == process.argv[3]);
+      if (!taskExist) {
+        console.log('No task with that id');
+      } else {
+        tasks.map((task) => {
+          if (task.id == taskExist.id) {
+            return (task.status = 'todo');
+          }
+        });
+        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
+          if (err) throw err;
+          console.log(
+            `Task with id ${taskExist.id} has been updated succesfully`
+          );
+        });
+      }
+    });
+  } else {
+    console.log('Need to specify which to update');
+  }
 }
 
 const firstUpperCase = (word) => {
