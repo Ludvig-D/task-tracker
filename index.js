@@ -8,8 +8,12 @@ function readTasks() {
   if (fs.existsSync(jsonFilePath)) {
     try {
       const data = fs.readFileSync(jsonFilePath);
-      const tasks = JSON.parse(data).sort((a, b) => a.id - b.id);
-      return tasks;
+      if (data.length > 0) {
+        const tasks = JSON.parse(data).sort((a, b) => a.id - b.id);
+        return tasks;
+      } else {
+        return [];
+      }
     } catch (err) {
       throw err;
     }
@@ -18,86 +22,58 @@ function readTasks() {
   }
 }
 
+function writeFile(tasks) {
+  fs.writeFileSync(jsonFilePath, JSON.stringify(tasks));
+}
+
+function listTasks(type) {
+  let tasks = readTasks();
+  if ([undefined, 'done', 'todo', 'in-progress'].includes(type)) {
+    const verifyTasks =
+      type != undefined ? tasks.filter((task) => task.status == type) : tasks;
+    if (verifyTasks.length > 0) {
+      console.log(`List of all ${type == undefined ? '' : type + ' '}tasks`);
+    }
+    verifyTasks.map((task) => {
+      console.log(
+        `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+          task.status
+        )}`
+      );
+    });
+    if (verifyTasks.length == 0) {
+      console.log(
+        `${
+          type == undefined
+            ? 'No tasks made yet'
+            : `No tasks with status ${type}`
+        }`
+      );
+    }
+  } else {
+    console.log('Type is not vaild');
+  }
+}
+
 let argv = process.argv;
 if (argv[2] == 'add') {
   let tasks = readTasks();
-  let newtask = {
-    item: `${argv[3]}`,
-    id: freeId(tasks),
-    status: argv[4] || 'todo',
-    createAt: new Date().getTime(),
-    updatedAt: new Date().getTime(),
-  };
-  tasks.push(newtask);
-
-  fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
-    if (err) throw err;
-    console.log(`Task added successfully (ID: ${newtask.id})`);
-  });
-} else if (argv[2] == 'list') {
-  let tasks = readTasks();
-  if (tasks != []) {
-    if (argv[3] == undefined) {
-      console.log('List of all tasks');
-      tasks.map((task) => {
-        console.log(
-          `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
-            task.status
-          )}`
-        );
-      });
-    } else if (argv[3] == 'done') {
-      let listNum = tasks.filter((task) => task.status == 'done').length;
-      if (listNum > 0) {
-        console.log('List of all done tasks');
-        tasks.map((task) => {
-          if (task.status == 'done') {
-            console.log(
-              `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
-                task.status
-              )}`
-            );
-          }
-        });
-      } else {
-        console.log('No tasks with status done');
-      }
-    } else if (argv[3] == 'todo') {
-      let listNum = tasks.filter((task) => task.status == 'todo').length;
-      if (listNum > 0) {
-        console.log('List of all todo tasks');
-        tasks.map((task) => {
-          if (task.status == 'todo') {
-            console.log(
-              `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
-                task.status
-              )}`
-            );
-          }
-        });
-      } else {
-        console.log('No tasks with status todo');
-      }
-    } else if (argv[3] == 'in-progress') {
-      let listNum = tasks.filter((task) => task.status == 'in-progress').length;
-      if (listNum > 0) {
-        tasks.map((task) => {
-          if (task.status == 'in-progress') {
-            console.log('List of all in-progress tasks');
-            console.log(
-              `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
-                task.status
-              )}`
-            );
-          }
-        });
-      } else {
-        console.log('No tasks with status in-progress');
-      }
-    }
-  } else {
-    console.log('No tasks exist yet');
+  try {
+    let newTask = {
+      item: `${argv[3]}`,
+      id: freeId(tasks),
+      status: argv[4] || 'todo',
+      createAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+    };
+    tasks.push(newTask);
+    writeFile(tasks);
+    console.log(`Task added successfully (ID: ${newTask.id})`);
+  } catch (err) {
+    throw err;
   }
+} else if (argv[2] == 'list') {
+  listTasks(argv[3]);
 } else if (argv[2] == 'update') {
   if (Number.isInteger(parseInt(argv[3]))) {
     if (argv[4]) {
@@ -230,7 +206,9 @@ if (argv[2] == 'add') {
 } else if (argv[2] == undefined) {
   console.log('Here are all the commands you can do:');
   console.log();
-  console.log('add "Write what you need to do here"');
+  console.log(
+    'add "Write what you need to do here" (If you want you can put status here)'
+  );
   console.log('update (ID) "Write what you want to change the task to"');
   console.log('del (ID)');
   console.log();
