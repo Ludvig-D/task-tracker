@@ -14,7 +14,7 @@ if (process.argv[2] == 'add') {
             id: 1,
           },
         ];
-        fs.writeFile('task.json', JSON.stringify(newtask), (err) => {
+        fs.writeFile(jsonFilePath, JSON.stringify(newtask), (err) => {
           if (err) throw err;
           console.log('File created and written successfully');
         });
@@ -29,19 +29,15 @@ if (process.argv[2] == 'add') {
 
       let newtask = {
         item: `${process.argv[3]}`,
-        id: tasks.length + 1,
+        id: freeId(tasks),
         status: process.argv[4] || 'todo',
         createAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       };
 
-      tasks.map((task) => {
-        if (task.id == newtask.id) newtask.id + 1;
-      });
-
       tasks.push(newtask);
 
-      fs.writeFile('task.json', JSON.stringify(tasks), (err) => {
+      fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
         if (err) throw err;
         console.log(`Task added successfully (ID: ${newtask.id})`);
       });
@@ -126,11 +122,13 @@ if (process.argv[2] == 'add') {
       if (!taskExist) {
         console.log('No task with that id');
       } else {
-        console.log(
-          `(ID:${taskExist.id}) ${firstUpperCase(
-            taskExist.item
-          )} - ${firstUpperCase(taskExist.status)}`
-        );
+        tasks.splice(tasks.indexOf(taskExist), 1);
+        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
+          if (err) throw err;
+          console.log(
+            `Task with id ${taskExist.id} has been succesfully removed`
+          );
+        });
       }
     });
   } else {
@@ -140,4 +138,27 @@ if (process.argv[2] == 'add') {
 
 const firstUpperCase = (word) => {
   return word.charAt(0).toUpperCase() + word.slice(1);
+};
+
+function compareIds(a, b) {
+  return a - b;
+}
+
+const freeId = (tasks) => {
+  let sortedIds = tasks
+    .map((task) => {
+      return task.id;
+    })
+    .sort(compareIds);
+
+  let idList = sortedIds[sortedIds.length - 1];
+
+  for (let i = 1; i <= sortedIds[sortedIds.length - 1]; i++) {
+    let idDosentExitYet = sortedIds.find((id) => id == i);
+    if (idDosentExitYet == undefined) {
+      return i;
+    } else if (idDosentExitYet != undefined && i == idList) {
+      return i + 1;
+    }
+  }
 };
