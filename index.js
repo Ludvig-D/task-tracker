@@ -55,7 +55,7 @@ function listTasks(type) {
   }
 }
 
-function update(id, newText) {
+function updateTask(id, newText) {
   if (Number.isInteger(parseInt(id))) {
     let tasks = readTasks();
     if (newText) {
@@ -82,7 +82,7 @@ function update(id, newText) {
   }
 }
 
-function del(id) {
+function deleteTask(id) {
   if (Number.isInteger(parseInt(id))) {
     let tasks = readTasks();
     let taskExist = tasks.find((task) => task.id == id);
@@ -96,6 +96,46 @@ function del(id) {
   } else {
     console.log('Has to be a id number');
   }
+}
+
+function markTask(id, type) {
+  if (Number.isInteger(parseInt(id))) {
+    let tasks = readTasks();
+    let taskExist = tasks.find((task) => task.id == id);
+    if (!taskExist) {
+      console.log('No task with that id');
+    } else {
+      tasks.map((task) => {
+        if (task.id == taskExist.id) {
+          task.status = type;
+          task.updatedAt = new Date().getTime();
+        }
+      });
+      writeFile(tasks);
+      console.log(`Task with id ${taskExist.id} has been updated succesfully`);
+    }
+  } else {
+    console.log('Need to specify which to update');
+  }
+}
+
+function help() {
+  console.log('Here are all the commands you can do:');
+  console.log();
+  console.log(
+    'add "Write what you need to do here" (If you want you can put status here)'
+  );
+  console.log('update (ID) "Write what you want to change the task to"');
+  console.log('del (ID)');
+  console.log();
+  console.log('mark-todo (ID)');
+  console.log('mark-done (ID)');
+  console.log('mark-in-progress (ID)');
+  console.log();
+  console.log('list');
+  console.log('list todo');
+  console.log('list done');
+  console.log('list in-progress');
 }
 
 let input = process.argv;
@@ -118,104 +158,17 @@ if (input[2] == 'add') {
 } else if (input[2] == 'list') {
   listTasks(input[3]);
 } else if (input[2] == 'update') {
-  update(input[3], input[4]);
+  updateTask(input[3], input[4]);
 } else if (input[2] == 'del') {
-  del(input[3]);
+  deleteTask(input[3]);
 } else if (input[2] == 'mark-in-progress') {
-  if (Number.isInteger(parseInt(input[3]))) {
-    fs.readFile(jsonFilePath, (err, data) => {
-      if (err) throw err;
-      let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == input[3]);
-      if (!taskExist) {
-        console.log('No task with that id');
-      } else {
-        tasks.map((task) => {
-          if (task.id == taskExist.id) {
-            task.status = 'in-progress';
-            task.updatedAt = new Date().getTime();
-          }
-        });
-        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
-          if (err) throw err;
-          console.log(
-            `Task with id ${taskExist.id} has been updated succesfully`
-          );
-        });
-      }
-    });
-  } else {
-    console.log('Need to specify which to update');
-  }
+  markTask(input[3], 'in-progress');
 } else if (input[2] == 'mark-done') {
-  if (Number.isInteger(parseInt(input[3]))) {
-    fs.readFile(jsonFilePath, (err, data) => {
-      if (err) throw err;
-      let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == input[3]);
-      if (!taskExist) {
-        console.log('No task with that id');
-      } else {
-        tasks.map((task) => {
-          if (task.id == taskExist.id) {
-            task.status = 'done';
-            task.updatedAt = new Date().getTime();
-          }
-        });
-        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
-          if (err) throw err;
-          console.log(
-            `Task with id ${taskExist.id} has been updated succesfully`
-          );
-        });
-      }
-    });
-  } else {
-    console.log('Need to specify which to update');
-  }
+  markTask(input[3], 'done');
 } else if (input[2] == 'mark-todo') {
-  if (Number.isInteger(parseInt(input[3]))) {
-    fs.readFile(jsonFilePath, (err, data) => {
-      if (err) throw err;
-      let tasks = JSON.parse(data);
-      let taskExist = tasks.find((task) => task.id == input[3]);
-      if (!taskExist) {
-        console.log('No task with that id');
-      } else {
-        tasks.map((task) => {
-          if (task.id == taskExist.id) {
-            task.status = 'todo';
-            task.updatedAt = new Date().getTime();
-          }
-        });
-        fs.writeFile(jsonFilePath, JSON.stringify(tasks), (err) => {
-          if (err) throw err;
-          console.log(
-            `Task with id ${taskExist.id} has been updated succesfully`
-          );
-        });
-      }
-    });
-  } else {
-    console.log('Need to specify which to update');
-  }
+  markTask(input[3], 'todo');
 } else if (input[2] == undefined) {
-  console.log('Here are all the commands you can do:');
-  console.log();
-  console.log(
-    'add "Write what you need to do here" (If you want you can put status here)'
-  );
-  console.log('update (ID) "Write what you want to change the task to"');
-  console.log('del (ID)');
-  console.log();
-  console.log('mark-todo (ID)');
-  console.log('mark-done (ID)');
-  console.log('mark-in-progress (ID)');
-  console.log();
-  console.log('list');
-  console.log('list todo');
-  console.log('list done');
-  console.log('list in-progress');
+  help();
 }
 
 function firstUpperCase(word) {
