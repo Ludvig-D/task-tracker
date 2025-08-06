@@ -142,16 +142,20 @@ let input = process.argv;
 if (input[2] == 'add') {
   let tasks = readTasks();
   try {
-    let newTask = {
-      item: `${input[3]}`,
-      id: freeId(tasks),
-      status: input[4] || 'todo',
-      createAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
-    };
-    tasks.push(newTask);
-    writeFile(tasks);
-    console.log(`Task added successfully (ID: ${newTask.id})`);
+    if ([undefined, 'done', 'todo', 'in-progress'].includes(input[4])) {
+      let newTask = {
+        item: `${input[3]}`,
+        id: freeId(tasks),
+        status: input[4] || 'todo',
+        createAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      };
+      tasks.push(newTask);
+      writeFile(tasks);
+      console.log(`Task added successfully (ID: ${newTask.id})`);
+    } else {
+      console.log('Type is not valid');
+    }
   } catch (err) {
     throw err;
   }
