@@ -11,7 +11,51 @@ function readTasks() {
       if (data.length > 0) {
         const tasks = JSON.parse(data).sort((a, b) => a.id - b.id);
         return tasks;
+function readTasks() {
+  if (fs.existsSync(jsonFilePath)) {
+    try {
+      const data = fs.readFileSync(jsonFilePath);
+      if (data.length > 0) {
+        const tasks = JSON.parse(data).sort((a, b) => a.id - b.id);
+        return tasks;
       } else {
+        return [];
+      }
+    } catch (err) {
+      throw err;
+    }
+  } else {
+    return [];
+  }
+}
+
+function writeFile(tasks) {
+  fs.writeFileSync(jsonFilePath, JSON.stringify(tasks));
+}
+
+function listTasks(type) {
+  let tasks = readTasks();
+  if ([undefined, 'done', 'todo', 'in-progress'].includes(type)) {
+    const verifyTasks =
+      type != undefined ? tasks.filter((task) => task.status == type) : tasks;
+    if (verifyTasks.length > 0) {
+      console.log(`List of all ${type == undefined ? '' : type + ' '}tasks`);
+    }
+    verifyTasks.map((task) => {
+      console.log(
+        `(ID:${task.id}) ${firstUpperCase(task.item)} - ${firstUpperCase(
+          task.status
+        )}`
+      );
+    });
+    if (verifyTasks.length == 0) {
+      console.log(
+        `${
+          type == undefined
+            ? 'No tasks made yet'
+            : `No tasks with status ${type}`
+        }`
+      );
         return [];
       }
     } catch (err) {
@@ -52,7 +96,15 @@ function listTasks(type) {
     }
   } else {
     console.log('Type is not vaild');
+    console.log('Type is not vaild');
   }
+}
+
+function updateTask(id, newText) {
+  if (Number.isInteger(parseInt(id))) {
+    let tasks = readTasks();
+    if (newText) {
+      let taskExist = tasks.find((task) => task.id == input[3]);
 }
 
 function updateTask(id, newText) {
@@ -66,9 +118,14 @@ function updateTask(id, newText) {
         tasks.map((task) => {
           if (task.id == taskExist.id) {
             task.item = input[4];
+            task.item = input[4];
             task.updatedAt = new Date().getTime();
           }
         });
+        writeFile(tasks);
+        console.log(
+          `Task with id ${taskExist.id} has been updated succesfully`
+        );
         writeFile(tasks);
         console.log(
           `Task with id ${taskExist.id} has been updated succesfully`
@@ -77,7 +134,11 @@ function updateTask(id, newText) {
     } else {
       console.log('You need to specify what you want to update it to');
     }
+    } else {
+      console.log('You need to specify what you want to update it to');
+    }
   } else {
+    console.log('You need to specify which item to update using its ID');
     console.log('You need to specify which item to update using its ID');
   }
 }
@@ -93,9 +154,41 @@ function deleteTask(id) {
       writeFile(tasks);
       console.log(`Deleted task succesfully ID: ${id}`);
     }
+}
+
+function deleteTask(id) {
+  if (Number.isInteger(parseInt(id))) {
+    let tasks = readTasks();
+    let taskExist = tasks.find((task) => task.id == id);
+    if (!taskExist) {
+      console.log('No task with that id');
+    } else {
+      tasks.splice(tasks.indexOf(taskExist), 1);
+      writeFile(tasks);
+      console.log(`Deleted task succesfully ID: ${id}`);
+    }
   } else {
     console.log('Has to be a id number');
+    console.log('Has to be a id number');
   }
+}
+
+function markTask(id, type) {
+  if (Number.isInteger(parseInt(id))) {
+    let tasks = readTasks();
+    let taskExist = tasks.find((task) => task.id == id);
+    if (!taskExist) {
+      console.log('No task with that id');
+    } else {
+      tasks.map((task) => {
+        if (task.id == taskExist.id) {
+          task.status = type;
+          task.updatedAt = new Date().getTime();
+        }
+      });
+      writeFile(tasks);
+      console.log(`Task with id ${taskExist.id} has been updated succesfully`);
+    }
 }
 
 function markTask(id, type) {
@@ -120,8 +213,14 @@ function markTask(id, type) {
 }
 
 function help() {
+}
+
+function help() {
   console.log('Here are all the commands you can do:');
   console.log();
+  console.log(
+    'add "Write what you need to do here" (If you want you can put status here)'
+  );
   console.log(
     'add "Write what you need to do here" (If you want you can put status here)'
   );
@@ -142,16 +241,20 @@ let input = process.argv;
 if (input[2] == 'add') {
   let tasks = readTasks();
   try {
-    let newTask = {
-      item: `${input[3]}`,
-      id: freeId(tasks),
-      status: input[4] || 'todo',
-      createAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
-    };
-    tasks.push(newTask);
-    writeFile(tasks);
-    console.log(`Task added successfully (ID: ${newTask.id})`);
+    if ([undefined, 'done', 'todo', 'in-progress'].includes(input[4])) {
+      let newTask = {
+        item: `${input[3]}`,
+        id: freeId(tasks),
+        status: input[4] || 'todo',
+        createAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      };
+      tasks.push(newTask);
+      writeFile(tasks);
+      console.log(`Task added successfully (ID: ${newTask.id})`);
+    } else {
+      console.log('Type is not valid');
+    }
   } catch (err) {
     throw err;
   }
@@ -174,11 +277,13 @@ if (input[2] == 'add') {
 function firstUpperCase(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
+}
 
 function compareIds(a, b) {
   return a - b;
 }
 
+function freeId(tasks) {
 function freeId(tasks) {
   let sortedIds = tasks
     .map((task) => {
@@ -196,4 +301,5 @@ function freeId(tasks) {
       return i + 1;
     }
   }
+}
 }
